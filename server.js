@@ -14,6 +14,23 @@ mongoose.connect("mongodb://localhost/workout", {
   useFindAndModify: false
 });
 
+app.get("/", (req, res) => {
+    res.sendFile('index.html');
+})
+
+
+
+app.get("/api/workouts", (req, res) => {
+    db.Workout.aggregate([{
+        $addFields: {
+            totalDuration: {$sum: '$exercises.duration'}
+        }
+    }]).then(workouts => {
+
+        console.log(workouts);
+        res.json(workouts);
+    });
+})
 
 app.listen(PORT, () => {
     console.log(`App running on http://localhost:${PORT}`);
