@@ -18,6 +18,13 @@ app.get("/", (req, res) => {
     res.sendFile('index.html');
 })
 
+app.get("/exercise", (req, res) => {
+    res.sendFile(__dirname + "/public/exercise.html");
+})
+
+app.get("/stats", (req, res) => {
+    res.sendFile(__dirname + "/public/stats.html");
+})
 
 
 app.get("/api/workouts", (req, res) => {
@@ -26,10 +33,48 @@ app.get("/api/workouts", (req, res) => {
             totalDuration: {$sum: '$exercises.duration'}
         }
     }]).then(workouts => {
-
-        console.log(workouts);
         res.json(workouts);
+    })
+    .catch(err => {
+        res.json(err);
     });
+})
+
+app.post("/api/workouts", ({body}, res) => {
+    var workout = new db.Workout(body);
+    db.Workout.create(workout)
+    .then(newWorkout => {
+        res.json(newWorkout);
+    })
+    .catch(err => {
+        res.json(err);
+    });
+
+
+})
+
+app.put("/api/workouts/:id", (req, res) => {
+    var newExercise = [req.body];
+    db.Workout.updateOne({_id: req.params.id}, {$push: {exercises: newExercise}}, {new: true})
+    .then(workout => {
+        res.json(workout);
+    })
+    .catch(err => {
+        res.json(err);
+    })
+})
+
+app.get("/api/workouts/range", (req, res) => {
+    db.Workout.aggregate([{
+        $addFields: {
+            totalDuration: {$sum: '$exercises.duration'}
+        }
+    }]).then(workouts => {
+        res.json(workouts);
+    })
+    .catch(err => {
+        res.json(err);
+    })
 })
 
 app.listen(PORT, () => {
