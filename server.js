@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
 });
 
 app.get("/", (req, res) => {
-    res.sendFile('index.html');
+    res.sendFile(__dirname + "/public/index.html");
 })
 
 app.get("/exercise", (req, res) => {
